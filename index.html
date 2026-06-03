@@ -1,0 +1,1860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Email Troubleshooting Visual Reference</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@400;600;700;800&display=swap');
+
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #1e2d45;
+    --accent: #00d4ff;
+    --accent2: #7c3aed;
+    --green: #10b981;
+    --red: #ef4444;
+    --yellow: #f59e0b;
+    --orange: #f97316;
+    --text: #e2e8f0;
+    --text-muted: #64748b;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .page-header {
+    text-align: center;
+    margin-bottom: 60px;
+    animation: fadeDown 0.8s ease both;
+  }
+
+  .page-header .label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    opacity: 0.8;
+  }
+
+  .page-header h1 {
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 800;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #fff 0%, var(--accent) 60%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+  }
+
+  .page-header p {
+    color: var(--text-muted);
+    font-size: 15px;
+    max-width: 500px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* Section titles */
+  .section-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.4;
+  }
+
+  .card-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #fff;
+  }
+
+  /* Flow diagram */
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: wrap;
+    margin: 24px 0;
+    justify-content: center;
+  }
+
+  .flow-node {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    text-align: center;
+    min-width: 120px;
+    position: relative;
+    transition: all 0.2s ease;
+    cursor: default;
+  }
+
+  .flow-node:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,212,255,0.15);
+  }
+
+  .flow-node .node-icon {
+    font-size: 22px;
+    margin-bottom: 6px;
+  }
+
+  .flow-node .node-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .flow-node .node-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    margin-top: 2px;
+  }
+
+  .flow-node.highlight {
+    border-color: var(--accent);
+    background: rgba(0,212,255,0.08);
+  }
+
+  .flow-node.opensense {
+    border-color: var(--accent2);
+    background: rgba(124,58,237,0.1);
+  }
+
+  .flow-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 6px;
+    gap: 2px;
+  }
+
+  .flow-arrow .arrow-line {
+    width: 32px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--border), var(--accent));
+    position: relative;
+  }
+
+  .flow-arrow .arrow-line::after {
+    content: '▶';
+    position: absolute;
+    right: -8px;
+    top: -7px;
+    font-size: 10px;
+    color: var(--accent);
+  }
+
+  .flow-arrow .arrow-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  /* Header anatomy */
+  .header-block {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.7;
+  }
+
+  .header-block .hb-bar {
+    background: var(--surface2);
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot.r { background: #ff5f56; }
+  .dot.y { background: #ffbd2e; }
+  .dot.g { background: #27c93f; }
+
+  .hb-bar span {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-left: 8px;
+  }
+
+  .header-line {
+    display: flex;
+    border-bottom: 1px solid rgba(30,45,69,0.5);
+    transition: background 0.15s ease;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .header-line:hover {
+    background: rgba(0,212,255,0.04);
+  }
+
+  .header-line:hover .tooltip {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .hl-tag {
+    padding: 8px 16px;
+    min-width: 220px;
+    border-right: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .hl-value {
+    padding: 8px 16px;
+    flex: 1;
+    word-break: break-all;
+    color: #a0aec0;
+  }
+
+  .tag-auth { color: #10b981; font-weight: 700; }
+  .tag-dkim { color: #00d4ff; font-weight: 700; }
+  .tag-received { color: #f59e0b; font-weight: 700; }
+  .tag-from { color: #f97316; font-weight: 700; }
+  .tag-return { color: #a78bfa; font-weight: 700; }
+  .tag-msgid { color: #64748b; }
+  .tag-dmarc { color: #10b981; font-weight: 700; }
+
+  .val-pass { color: #10b981; font-weight: 700; }
+  .val-fail { color: #ef4444; font-weight: 700; }
+  .val-soft { color: #f59e0b; font-weight: 700; }
+  .val-neutral { color: #64748b; }
+
+  /* Tooltip */
+  .tooltip {
+    position: absolute;
+    left: calc(100% + 12px);
+    top: 50%;
+    transform: translateY(calc(-50% + 6px));
+    background: #1a2235;
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 12px 16px;
+    width: 280px;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+
+  .tooltip::before {
+    content: '';
+    position: absolute;
+    left: -6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 10px;
+    height: 10px;
+    background: #1a2235;
+    border-left: 1px solid var(--accent);
+    border-bottom: 1px solid var(--accent);
+    transform: translateY(-50%) rotate(45deg);
+  }
+
+  .tooltip-title {
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .tooltip-body {
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .tooltip-badge {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .badge-critical { background: rgba(239,68,68,0.2); color: #ef4444; }
+  .badge-important { background: rgba(0,212,255,0.15); color: var(--accent); }
+  .badge-info { background: rgba(100,116,139,0.2); color: #94a3b8; }
+
+  /* Auth results grid */
+  .auth-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin: 20px 0;
+  }
+
+  .auth-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .auth-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+  }
+
+  .auth-card.spf::before { background: linear-gradient(90deg, #f59e0b, transparent); }
+  .auth-card.dkim::before { background: linear-gradient(90deg, #00d4ff, transparent); }
+  .auth-card.dmarc::before { background: linear-gradient(90deg, #10b981, transparent); }
+  .auth-card.arc::before { background: linear-gradient(90deg, #a78bfa, transparent); }
+
+  .auth-card .ac-name {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .auth-card.spf .ac-name { color: #f59e0b; }
+  .auth-card.dkim .ac-name { color: #00d4ff; }
+  .auth-card.dmarc .ac-name { color: #10b981; }
+  .auth-card.arc .ac-name { color: #a78bfa; }
+
+  .auth-card .ac-what {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
+  .auth-card .ac-checks {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    font-family: var(--mono);
+  }
+
+  /* Decision tree */
+  .tree {
+    margin: 20px 0;
+  }
+
+  .tree-node {
+    margin-bottom: 12px;
+  }
+
+  .tree-question {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .tree-question:hover {
+    background: rgba(0,212,255,0.06);
+  }
+
+  .tree-question .step-num {
+    background: var(--accent);
+    color: #000;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    flex-shrink: 0;
+    font-family: var(--mono);
+  }
+
+  .tree-answers {
+    display: none;
+    margin-top: 8px;
+    margin-left: 36px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .tree-answer {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: var(--mono);
+    line-height: 1.5;
+  }
+
+  .tree-answer .ans-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  .tree-answer.yes .ans-label { color: var(--green); }
+  .tree-answer.no .ans-label { color: var(--red); }
+  .tree-answer.check .ans-label { color: var(--yellow); }
+
+  /* Status badges */
+  .status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+    margin: 16px 0;
+  }
+
+  .status-badge {
+    border-radius: 8px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+
+  .status-badge .sb-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .sb-pass { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); }
+  .sb-pass .sb-dot { background: #10b981; box-shadow: 0 0 6px #10b981; }
+  .sb-pass .sb-label { color: #10b981; font-weight: 700; }
+
+  .sb-fail { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); }
+  .sb-fail .sb-dot { background: #ef4444; box-shadow: 0 0 6px #ef4444; }
+  .sb-fail .sb-label { color: #ef4444; font-weight: 700; }
+
+  .sb-soft { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); }
+  .sb-soft .sb-dot { background: #f59e0b; }
+  .sb-soft .sb-label { color: #f59e0b; font-weight: 700; }
+
+  .sb-none { background: rgba(100,116,139,0.12); border: 1px solid rgba(100,116,139,0.3); }
+  .sb-none .sb-dot { background: #64748b; }
+  .sb-none .sb-label { color: #94a3b8; font-weight: 700; }
+
+  .sb-label { display: block; margin-bottom: 2px; }
+  .sb-desc { color: var(--text-muted); font-size: 10px; }
+
+  /* Opensense flow */
+  .os-flow {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    margin: 16px 0;
+  }
+
+  .os-step {
+    display: flex;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(30,45,69,0.5);
+    align-items: flex-start;
+  }
+
+  .os-step:last-child { border-bottom: none; }
+
+  .os-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .os-step.os-highlight .os-num {
+    background: rgba(124,58,237,0.2);
+    border-color: var(--accent2);
+    color: #a78bfa;
+  }
+
+  .os-content .os-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .os-content .os-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    font-family: var(--mono);
+  }
+
+  .os-step.os-highlight .os-content .os-title { color: #c4b5fd; }
+
+  /* SMTP Handshake Visualization */
+  .smtp-scene {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 16px 0;
+  }
+
+  .smtp-row {
+    display: grid;
+    grid-template-columns: 1fr 60px 1fr;
+    align-items: center;
+    min-height: 46px;
+    border-bottom: 1px solid rgba(30,45,69,0.5);
+    transition: background 0.15s ease;
+    cursor: default;
+    position: relative;
+  }
+
+  .smtp-row:last-child { border-bottom: none; }
+  .smtp-row:hover { background: rgba(0,212,255,0.03); }
+  .smtp-row:hover .smtp-ttip { opacity: 1; pointer-events: auto; }
+
+  .smtp-row.phase-header {
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    cursor: default;
+  }
+
+  .smtp-row.phase-header:hover { background: var(--surface2); }
+
+  .phase-label-txt {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 10px;
+  }
+
+  .smtp-cell {
+    padding: 10px 16px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  .smtp-cell.sender { text-align: right; color: var(--accent); }
+  .smtp-cell.receiver { text-align: left; color: #10b981; }
+
+  .smtp-cell.sender .smtp-explain { color: rgba(0,212,255,0.5); font-size: 10px; font-weight: 400; display: block; margin-top: 2px; }
+  .smtp-cell.receiver .smtp-explain { color: rgba(16,185,129,0.5); font-size: 10px; font-weight: 400; display: block; margin-top: 2px; }
+
+  .smtp-mid {
+    text-align: center;
+    font-size: 16px;
+    padding: 10px 0;
+  }
+
+  .arrow-r { color: var(--accent); }
+  .arrow-l { color: #10b981; }
+
+  .smtp-headers-row {
+    grid-column: 1 / -1;
+    padding: 12px 20px;
+    background: rgba(0,0,0,0.3);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: #f59e0b;
+    line-height: 1.8;
+    border-bottom: 1px solid rgba(30,45,69,0.5);
+  }
+
+  .smtp-headers-row .hdr-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  .smtp-server-bar {
+    display: grid;
+    grid-template-columns: 1fr 60px 1fr;
+    background: var(--surface2);
+    border-bottom: 2px solid var(--border);
+    padding: 12px 16px;
+  }
+
+  .ssb-sender {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    text-align: right;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .ssb-receiver {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: #10b981;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .ssb-mid {
+    text-align: center;
+    font-size: 10px;
+    color: var(--text-muted);
+    font-family: var(--mono);
+  }
+
+  .smtp-ttip {
+    position: absolute;
+    right: calc(100% + 12px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: #1a2235;
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 10px 14px;
+    width: 240px;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    font-family: var(--sans);
+  }
+
+  .smtp-ttip-t { font-size: 11px; font-weight: 700; color: var(--accent); margin-bottom: 5px; }
+  .smtp-ttip-b { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+
+  /* SMTP codes */
+  .code-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 10px;
+    margin: 16px 0;
+  }
+
+  .smtp-code {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .code-num {
+    font-family: var(--mono);
+    font-size: 16px;
+    font-weight: 700;
+    flex-shrink: 0;
+    width: 44px;
+  }
+
+  .code-250 { color: #10b981; }
+  .code-4xx { color: #f59e0b; }
+  .code-5xx { color: #ef4444; }
+
+  .code-info .code-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 3px;
+  }
+
+  .code-info .code-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.4;
+    font-family: var(--mono);
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0;
+  }
+
+  .tab {
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.2s ease;
+    font-family: var(--mono);
+  }
+
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* Animations */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card { animation: fadeIn 0.5s ease both; }
+  .card:nth-child(2) { animation-delay: 0.1s; }
+  .card:nth-child(3) { animation-delay: 0.2s; }
+  .card:nth-child(4) { animation-delay: 0.3s; }
+
+  /* Hover tip */
+  .hover-tip {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-bottom: 12px;
+    opacity: 0.7;
+  }
+
+  .desktop-hint { display: inline; }
+  .mobile-hint { display: none; }
+  @media (max-width: 700px) {
+    .desktop-hint { display: none; }
+    .mobile-hint { display: inline; }
+  }
+
+  /* ── MOBILE RESPONSIVE ── */
+  @media (max-width: 700px) {
+
+    /* Container */
+    .container { padding: 20px 12px; }
+    .card { padding: 16px 12px; }
+    .card-title { font-size: 15px; }
+    .page-header { margin-bottom: 32px; }
+    .page-header p { font-size: 13px; }
+
+    /* ── FLOW DIAGRAMS: stack vertically ── */
+    .flow {
+      flex-direction: column !important;
+      align-items: center !important;
+      overflow-x: visible !important;
+      flex-wrap: nowrap !important;
+      gap: 0 !important;
+    }
+
+    .flow-node {
+      min-width: 0 !important;
+      width: 100% !important;
+      max-width: 260px;
+      padding: 10px 14px;
+    }
+
+    /* Rotate arrows to point downward */
+    .flow-arrow {
+      flex-direction: row;
+      padding: 4px 0;
+      gap: 4px;
+      justify-content: center;
+    }
+
+    .flow-arrow .arrow-line {
+      width: 2px;
+      height: 28px;
+      background: linear-gradient(180deg, var(--border), var(--accent));
+    }
+
+    .flow-arrow .arrow-line::after {
+      content: '▼';
+      right: auto;
+      top: auto;
+      bottom: -10px;
+      left: -4px;
+      font-size: 10px;
+    }
+
+    .flow-arrow .arrow-label {
+      writing-mode: vertical-lr;
+      font-size: 8px;
+      white-space: nowrap;
+    }
+
+    /* Journey section divider */
+    .journey-divider { margin: 12px 0; }
+
+    /* ── SMTP HANDSHAKE: collapse 3-col grid to stacked rows ── */
+    .smtp-server-bar {
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .ssb-mid { display: none; }
+
+    .smtp-row {
+      grid-template-columns: 1fr;
+      min-height: auto;
+    }
+
+    /* Each SMTP row becomes a labeled card */
+    .smtp-row.phase-header { padding: 0; }
+
+    .smtp-cell {
+      padding: 8px 12px;
+      text-align: left !important;
+    }
+
+    /* Show direction as a prefix label instead of center column */
+    .smtp-cell.sender::before {
+      content: '→ SEND  ';
+      color: var(--accent);
+      font-size: 9px;
+      letter-spacing: 1px;
+      display: block;
+      margin-bottom: 2px;
+      opacity: 0.7;
+    }
+
+    .smtp-cell.receiver::before {
+      content: '← RECV  ';
+      color: #10b981;
+      font-size: 9px;
+      letter-spacing: 1px;
+      display: block;
+      margin-bottom: 2px;
+      opacity: 0.7;
+    }
+
+    /* Hide empty cells on mobile */
+    .smtp-cell:empty { display: none; }
+
+    .smtp-mid { display: none; }
+
+    /* Tooltips: replace hover with tap — show below instead of to the side */
+    .smtp-ttip {
+      position: static;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      transform: none !important;
+      width: 100%;
+      margin-top: 6px;
+      border-color: var(--border);
+      box-shadow: none;
+      display: none; /* hidden by default, toggled by JS tap */
+    }
+
+    /* ── HEADER ANATOMY: stack tag above value ── */
+    .header-line {
+      flex-direction: column;
+      cursor: pointer;
+    }
+
+    .hl-tag {
+      min-width: 0 !important;
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+      padding: 6px 12px;
+      font-size: 10px;
+    }
+
+    .hl-value {
+      padding: 6px 12px;
+      font-size: 10px;
+      word-break: break-all;
+    }
+
+    /* Tooltips on header lines: show inline below row on tap */
+    .tooltip {
+      position: static !important;
+      left: auto !important;
+      top: auto !important;
+      transform: none !important;
+      width: 100% !important;
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, opacity 0.3s ease;
+      border-top: 1px solid var(--border);
+      border-radius: 0 0 8px 8px;
+      margin: 0;
+      box-shadow: none;
+    }
+
+    .tooltip::before { display: none; }
+
+    .header-line.expanded .tooltip {
+      opacity: 1;
+      max-height: 200px;
+    }
+
+    /* Tap hint */
+    .hover-tip::after {
+      content: ' — tap a row to expand';
+    }
+
+    /* ── AUTH GRID: single column ── */
+    .auth-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    /* ── STATUS GRID: 2 columns ── */
+    .status-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    /* ── TREE ANSWERS: single column ── */
+    .tree-answers {
+      grid-template-columns: 1fr;
+    }
+
+    /* ── TABS: scrollable ── */
+    .tabs {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      flex-wrap: nowrap;
+      padding-bottom: 1px;
+      gap: 0;
+    }
+
+    .tab {
+      padding: 8px 12px;
+      font-size: 11px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* ── CODE GRID: single column ── */
+    .code-grid {
+      grid-template-columns: 1fr;
+    }
+
+    /* ── OS FLOW steps ── */
+    .os-flow { padding: 12px; }
+    .os-step { gap: 10px; padding: 10px 0; }
+
+    /* ── SMTP summary cards at bottom of handshake ── */
+    .smtp-summary-grid {
+      grid-template-columns: 1fr 1fr !important;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .status-grid { grid-template-columns: 1fr; }
+    .smtp-summary-grid { grid-template-columns: 1fr !important; }
+    .smtp-server-bar { grid-template-columns: 1fr; }
+    .ssb-receiver { text-align: left; margin-top: 4px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="page-header">
+    <div class="label">Implementation Engineering Reference</div>
+    <h1>Email Delivery & Header Forensics</h1>
+    <p>Visual reference for reading headers, troubleshooting authentication, and understanding Opensense's role in mail flow.</p>
+  </div>
+
+  <!-- SECTION 1: Email Journey -->
+  <div class="section-title">01 — The Email Journey</div>
+  <div class="card">
+    <div class="card-title">How a message travels from Send to Inbox (with Opensense)</div>
+
+    <!-- Row 1: Sender side -->
+    <div style="font-family:var(--mono); font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:2px; margin-bottom:10px; margin-top:4px;">Sender Side</div>
+    <div class="flow" style="justify-content:flex-start; flex-wrap:nowrap; overflow-x:auto; padding-bottom:8px;">
+      <div class="flow-node">
+        <div class="node-icon">💻</div>
+        <div class="node-label">Sender</div>
+        <div class="node-name">Outlook / Gmail</div>
+      </div>
+      <div class="flow-arrow">
+        <div class="arrow-line"></div>
+        <div class="arrow-label">SMTP/TLS</div>
+      </div>
+      <div class="flow-node highlight">
+        <div class="node-icon">☁️</div>
+        <div class="node-label">Tenant</div>
+        <div class="node-name">M365 or Google</div>
+      </div>
+      <div class="flow-arrow">
+        <div class="arrow-line"></div>
+        <div class="arrow-label">Connector</div>
+      </div>
+      <div class="flow-node opensense">
+        <div class="node-icon">⚡</div>
+        <div class="node-label">Processor</div>
+        <div class="node-name">Opensense</div>
+      </div>
+      <div class="flow-arrow">
+        <div class="arrow-line"></div>
+        <div class="arrow-label">Hands back</div>
+      </div>
+      <div class="flow-node highlight">
+        <div class="node-icon">☁️</div>
+        <div class="node-label">Re-signs DKIM</div>
+        <div class="node-name">M365 or Google</div>
+      </div>
+      <div class="flow-arrow">
+        <div class="arrow-line"></div>
+        <div class="arrow-label">SMTP/TLS</div>
+      </div>
+      <div class="flow-node">
+        <div class="node-icon">🌐</div>
+        <div class="node-label">Internet</div>
+        <div class="node-name">DNS / MX Lookup</div>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div style="border-top:1px dashed var(--border); margin:16px 0; position:relative;">
+      <span style="position:absolute; top:-9px; left:50%; transform:translateX(-50%); background:var(--surface); padding:0 12px; font-family:var(--mono); font-size:10px; color:var(--text-muted);">message crosses to recipient's infrastructure</span>
+    </div>
+
+    <!-- Row 2: Recipient side -->
+    <div style="font-family:var(--mono); font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:2px; margin-bottom:10px;">Recipient Side</div>
+    <div class="flow" style="justify-content:flex-start; flex-wrap:nowrap; overflow-x:auto; padding-bottom:4px;">
+      <div class="flow-node">
+        <div class="node-icon">🌐</div>
+        <div class="node-label">Internet</div>
+        <div class="node-name">DNS / MX Lookup</div>
+      </div>
+      <div class="flow-arrow">
+        <div class="arrow-line"></div>
+        <div class="arrow-label">SMTP/TLS</div>
+      </div>
+      <div class="flow-node highlight" style="border-color:#10b981; background:rgba(16,185,129,0.08);">
+        <div class="node-icon">🔐</div>
+        <div class="node-label" style="color:#10b981;">Auth Checks</div>
+        <div class="node-name">Receiving Server</div>
+      </div>
+      <div class="flow-arrow">
+        <div class="arrow-line"></div>
+        <div class="arrow-label">IMAP / POP3</div>
+      </div>
+      <div class="flow-node">
+        <div class="node-icon">📥</div>
+        <div class="node-label">Destination</div>
+        <div class="node-name">Recipient Inbox</div>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:16px;">
+      <div style="background:rgba(124,58,237,0.08); border:1px solid rgba(124,58,237,0.25); border-radius:8px; padding:12px 16px; font-family:var(--mono); font-size:11px; color:#a78bfa; line-height:1.6;">
+        <strong>Opensense's role:</strong> Mid-transport processor. Strips inbound DKIM (body will be modified), adds signature/banner, hands back to M365/Google which re-signs DKIM outbound.
+      </div>
+      <div style="background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.25); border-radius:8px; padding:12px 16px; font-family:var(--mono); font-size:11px; color:#10b981; line-height:1.6;">
+        <strong>SPF · DKIM · DMARC</strong> are evaluated at the recipient's receiving server — after M365/Google re-signed. Opensense is not involved at that stage.
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 1b: SMTP Handshake -->
+  <div class="section-title">01b — The SMTP Handshake</div>
+  <div class="card">
+    <div class="card-title">What two mail servers actually say to each other</div>
+    <p style="font-size:12px; color:var(--text-muted); font-family:var(--mono); margin-bottom:16px; line-height:1.6;">
+      Every email delivery is a conversation between two servers. This is that conversation — verbatim. <span class="desktop-hint">Hover</span><span class="mobile-hint">Tap</span> any row for what it means.
+    </p>
+
+    <div class="smtp-scene">
+
+      <!-- Server bar -->
+      <div class="smtp-server-bar">
+        <div class="ssb-sender">📤 Sending Server<br><span style="color:var(--text-muted); font-size:9px; font-weight:400;">mail.sender.com</span></div>
+        <div class="ssb-mid">⟷</div>
+        <div class="ssb-receiver">📥 Receiving Server<br><span style="color:var(--text-muted); font-size:9px; font-weight:400;">mx.recipient.com</span></div>
+      </div>
+
+      <!-- Phase 1: Connection -->
+      <div class="smtp-row phase-header">
+        <div class="phase-label-txt" style="color:#a78bfa;">Phase 1 — TCP Connection &amp; Greeting</div>
+      </div>
+
+      <div class="smtp-row">
+        <div class="smtp-cell sender"></div>
+        <div class="smtp-mid"><span class="arrow-l">←</span></div>
+        <div class="smtp-cell receiver">
+          220 mx.recipient.com ESMTP ready
+          <span class="smtp-explain">Server announces itself and readiness</span>
+        </div>
+        <div class="smtp-ttip" style="left:auto; right:auto; left:calc(100% + 12px);">
+          <div class="smtp-ttip-t">220 — Service Ready</div>
+          <div class="smtp-ttip-b">The receiving server opens the connection and identifies itself. The 220 code means "I'm here and ready." If you see anything other than 220, the connection failed before it started.</div>
+        </div>
+      </div>
+
+      <!-- Phase 2: EHLO -->
+      <div class="smtp-row phase-header">
+        <div class="phase-label-txt" style="color:var(--accent);">Phase 2 — EHLO Handshake (Capability Exchange)</div>
+      </div>
+
+      <div class="smtp-row">
+        <div class="smtp-cell sender">
+          EHLO mail.sender.com
+          <span class="smtp-explain">Sender identifies itself</span>
+        </div>
+        <div class="smtp-mid"><span class="arrow-r">→</span></div>
+        <div class="smtp-cell receiver"></div>
+        <div class="smtp-ttip">
+          <div class="smtp-ttip-t">EHLO — Extended Hello</div>
+          <div class="smtp-ttip-b">The sending server introduces itself by hostname. EHLO (not old HELO) requests the receiving server's list of supported extensions. The hostname here should match the sending server's PTR record — mismatches can trigger spam flags.</div>
+        </div>
+      </div>
+
+      <div class="smtp-row">
+        <div class="smtp-cell sender"></div>
+        <div class="smtp-mid"><span class="arrow-l">←</span></div>
+        <div class="smtp-cell receiver">
+          250-mx.recipient.com Hello<br>
+          250-SIZE 52428800<br>
+          250-STARTTLS<br>
+          250-AUTH LOGIN PLAIN<br>
+          250 ENHANCEDSTATUSCODES
+          <span class="smtp-explain">Receiving server lists what it supports</span>
+        </div>
+        <div class="smtp-ttip" style="left:auto; right:calc(100% + 12px);">
+          <div class="smtp-ttip-t">250 — Capability List</div>
+          <div class="smtp-ttip-b">The receiving server responds with what it supports. Key items: SIZE (max message size), STARTTLS (TLS encryption available), AUTH (authentication methods). If STARTTLS is listed, the next step is usually to upgrade to TLS before sending credentials or mail.</div>
+        </div>
+      </div>
+
+      <!-- Phase 3: TLS -->
+      <div class="smtp-row phase-header">
+        <div class="phase-label-txt" style="color:#f59e0b;">Phase 3 — TLS Encryption (STARTTLS)</div>
+      </div>
+
+      <div class="smtp-row">
+        <div class="smtp-cell sender">
+          STARTTLS
+          <span class="smtp-explain">Request to upgrade to encrypted connection</span>
+        </div>
+        <div class="smtp-mid"><span class="arrow-r">→</span></div>
+        <div class="smtp-cell receiver"></div>
+        <div class="smtp-ttip">
+          <div class="smtp-ttip-t">STARTTLS</div>
+          <div class="smtp-ttip-b">The sending server requests that the connection be upgraded to TLS encryption. Without this, the entire SMTP conversation including message content travels in plain text. Opensense requires TLS on its connectors — this is that negotiation.</div>
+        </div>
+      </div>
+
+      <div class="smtp-row">
+        <div class="smtp-cell sender"></div>
+        <div class="smtp-mid"><span class="arrow-l">←</span></div>
+        <div class="smtp-cell receiver">
+          220 Ready to start TLS
+          <span class="smtp-explain">TLS handshake begins — connection is now encrypted</span>
+        </div>
+        <div class="smtp-ttip" style="left:auto; right:calc(100% + 12px);">
+          <div class="smtp-ttip-t">220 — TLS Accepted</div>
+          <div class="smtp-ttip-b">From this point on the connection is encrypted. A new EHLO is sent after TLS is established. Everything after this point — credentials, envelope addresses, message content — is encrypted in transit.</div>
+        </div>
+      </div>
+
+      <!-- Phase 4: Envelope -->
+      <div class="smtp-row phase-header">
+        <div class="phase-label-txt" style="color:#f97316;">Phase 4 — Envelope Exchange (Who / Where)</div>
+      </div>
+
+      <div class="smtp-row">
+        <div class="smtp-cell sender">
+          MAIL FROM:&lt;sender@sender.com&gt;
+          <span class="smtp-explain">Envelope sender — SPF checks this</span>
+        </div>
+        <div class="smtp-mid"><span class="arrow-r">→</span></div>
+        <div class="smtp-cell receiver"></div>
+        <div class="smtp-ttip">
+          <div class="smtp-ttip-t">MAIL FROM — The Envelope Sender</div>
+          <div class="smtp-ttip-b">This is the Return-Path / envelope sender. It's NOT necessarily the From address the recipient sees. SPF validates this domain against the sending IP. Bounces are returned here. This can differ from the visible From header — that difference is at the heart of DMARC alignment.</div>
+        </div>
+      </div>
+
+      <div class="smtp-row">
+        <div class="smtp-cell sender"></div>
+        <div class="smtp-mid"><span class="arrow-l">←</span></div>
+        <div class="smtp-cell receiver">
+          250 OK
+          <span class="smtp-explain">Sender address accepted</span>
+        </div>
+        <div class="smtp-ttip" style="left:auto; right:calc(100% + 12px);">
+          <div class="smtp-ttip-t">250 OK — Sender Accepted</div>
+          <div class="smtp-ttip-b">The receiving server accepts the envelope sender. At this point it may run an SPF check against the MAIL FROM domain. Some servers do this here; others wait until after DATA.</div>
+        </div>
+      </div>
+
+      <div class="smtp-row">
+        <div class="smtp-cell sender">
+          RCPT TO:&lt;recipient@recipient.com&gt;
+          <span class="smtp-explain">Envelope recipient — actual delivery address</span>
+        </div>
+        <div class="smtp-mid"><span class="arrow-r">→</span></div>
+        <div class="smtp-cell receiver"></div>
+        <div class="smtp-ttip">
+          <div class="smtp-ttip-t">RCPT TO — The Envelope Recipient</div>
+          <div class="smtp-ttip-b">The actual delivery address. Can differ from the To: header (e.g., BCC recipients, mailing lists, aliases). The receiving server checks whether this address exists. A 550 here means the user doesn't exist on that server.</div>
+        </div>
+      </div>
+
+      <div class="smtp-row">
+        <div class="smtp-cell sender"></div>
+        <div class="smtp-mid"><span class="arrow-l">←</span></div>
+        <div class="smtp-cell receiver">
+          250 OK
+          <span class="smtp-explain">Recipient address accepted — mailbox exists</span>
+        </div>
+        <div class="smtp-ttip" style="left:auto; right:calc(100% + 12px);">
+          <div class="smtp-ttip-t">250 OK — Recipient Accepted</div>
+          <div class="smtp-ttip-b">The receiving server confirms the mailbox exists and will accept mail. If it returned 550 here, the NDR you'd see says "user unknown" or "mailbox not found."</div>
+        </div>
+      </div>
+
+      <!-- Phase 5: DATA -->
+      <div class="smtp-row phase-header">
+        <div class="phase-label-txt" style="color:#10b981;">Phase 5 — Message Transmission (DATA)</div>
+      </div>
+
+      <div class="smtp-row">
+        <div class="smtp-cell sender">
+          DATA
+          <span class="smtp-explain">Ready to send the actual message</span>
+        </div>
+        <div class="smtp-mid"><span class="arrow-r">→</span></div>
+        <div class="smtp-cell receiver"></div>
+        <div class="smtp-ttip">
+          <div class="smtp-ttip-t">DATA Command</div>
+          <div class="smtp-ttip-b">The sending server announces it's about to transmit the full message — all headers and body. The receiving server must respond with 354 before the content is sent.</div>
+        </div>
+      </div>
+
+      <div class="smtp-row">
+        <div class="smtp-cell sender"></div>
+        <div class="smtp-mid"><span class="arrow-l">←</span></div>
+        <div class="smtp-cell receiver">
+          354 Start input, end with "."
+          <span class="smtp-explain">Go ahead, end message with a period on its own line</span>
+        </div>
+        <div class="smtp-ttip" style="left:auto; right:calc(100% + 12px);">
+          <div class="smtp-ttip-t">354 — Send the Message</div>
+          <div class="smtp-ttip-b">The receiving server is ready. The sender now transmits all headers (From, To, Subject, DKIM-Signature, Received, etc.) followed by the message body. The message ends with a single period on its own line.</div>
+        </div>
+      </div>
+
+      <!-- Message content row -->
+      <div class="smtp-headers-row">
+        <div class="hdr-label">Message transmitted (headers + body):</div>
+        From: Jane Smith &lt;sender@sender.com&gt;<br>
+        To: recipient@recipient.com<br>
+        Subject: Q2 Planning Meeting<br>
+        DKIM-Signature: v=1; a=rsa-sha256; d=sender.com; s=selector1; ...<br>
+        Date: Mon, 20 May 2024 12:15:28 -0400<br>
+        Message-ID: &lt;CABxxxxxxx@mail.sender.com&gt;<br>
+        <br>
+        [message body here]<br>
+        <br>
+        .  &nbsp;&nbsp;<span style="color:var(--text-muted); font-size:10px;">← single period signals end of message</span>
+      </div>
+
+      <div class="smtp-row">
+        <div class="smtp-cell sender"></div>
+        <div class="smtp-mid"><span class="arrow-l">←</span></div>
+        <div class="smtp-cell receiver">
+          250 OK: Message queued as abc123
+          <span class="smtp-explain">Message accepted — now in delivery queue</span>
+        </div>
+        <div class="smtp-ttip" style="left:auto; right:calc(100% + 12px);">
+          <div class="smtp-ttip-t">250 OK — Message Accepted</div>
+          <div class="smtp-ttip-b">The receiving server accepted the full message. It now runs spam filters, content checks, and authentication verification (SPF, DKIM, DMARC). The queue ID lets admins trace the message in server logs.</div>
+        </div>
+      </div>
+
+      <!-- Phase 6: Close -->
+      <div class="smtp-row phase-header">
+        <div class="phase-label-txt" style="color:var(--text-muted);">Phase 6 — Connection Close</div>
+      </div>
+
+      <div class="smtp-row">
+        <div class="smtp-cell sender">
+          QUIT
+          <span class="smtp-explain">Done — closing connection</span>
+        </div>
+        <div class="smtp-mid"><span class="arrow-r">→</span></div>
+        <div class="smtp-cell receiver"></div>
+        <div class="smtp-ttip">
+          <div class="smtp-ttip-t">QUIT</div>
+          <div class="smtp-ttip-b">The sending server cleanly closes the connection. A proper QUIT is the sign of a well-behaved mail server. Servers that drop connections without QUIT can trigger spam signals on some receiving systems.</div>
+        </div>
+      </div>
+
+      <div class="smtp-row">
+        <div class="smtp-cell sender"></div>
+        <div class="smtp-mid"><span class="arrow-l">←</span></div>
+        <div class="smtp-cell receiver">
+          221 Bye
+          <span class="smtp-explain">Connection closed</span>
+        </div>
+        <div class="smtp-ttip" style="left:auto; right:calc(100% + 12px);">
+          <div class="smtp-ttip-t">221 — Closing Connection</div>
+          <div class="smtp-ttip-b">The receiving server closes the TCP connection. The SMTP session is complete. The message is now in the receiving server's queue for local delivery to the mailbox.</div>
+        </div>
+      </div>
+
+    </div><!-- end smtp-scene -->
+
+    <div class="smtp-summary-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:10px; margin-top:16px;">
+      <div style="background:rgba(0,212,255,0.07); border:1px solid rgba(0,212,255,0.2); border-radius:8px; padding:12px; font-family:var(--mono); font-size:11px; line-height:1.6;">
+        <span style="color:var(--accent); font-weight:700;">MAIL FROM</span><br>
+        <span style="color:var(--text-muted);">The envelope sender. SPF checks this. Can differ from From: header. This is the Return-Path.</span>
+      </div>
+      <div style="background:rgba(249,115,22,0.07); border:1px solid rgba(249,115,22,0.2); border-radius:8px; padding:12px; font-family:var(--mono); font-size:11px; line-height:1.6;">
+        <span style="color:#f97316; font-weight:700;">From: header</span><br>
+        <span style="color:var(--text-muted);">What the recipient sees. DMARC aligns against this. Set inside DATA, not the envelope.</span>
+      </div>
+      <div style="background:rgba(245,158,11,0.07); border:1px solid rgba(245,158,11,0.2); border-radius:8px; padding:12px; font-family:var(--mono); font-size:11px; line-height:1.6;">
+        <span style="color:#f59e0b; font-weight:700;">RCPT TO</span><br>
+        <span style="color:var(--text-muted);">Actual delivery address. Can differ from To: header. BCC recipients appear only here.</span>
+      </div>
+      <div style="background:rgba(16,185,129,0.07); border:1px solid rgba(16,185,129,0.2); border-radius:8px; padding:12px; font-family:var(--mono); font-size:11px; line-height:1.6;">
+        <span style="color:#10b981; font-weight:700;">DATA section</span><br>
+        <span style="color:var(--text-muted);">All headers + body live here. DKIM signs this content. Authentication checks run after DATA is received.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: Authentication -->
+  <div class="section-title">02 — Authentication Checks</div>
+  <div class="card">
+    <div class="card-title">SPF · DKIM · DMARC · ARC</div>
+    <div class="auth-grid">
+      <div class="auth-card spf">
+        <div class="ac-name">SPF</div>
+        <div class="ac-what">Is this server allowed to send for this domain?</div>
+        <div class="ac-checks">
+          Checks: envelope MAIL FROM<br>
+          Against: sending IP<br>
+          Lives in: DNS TXT record<br>
+          Max lookups: 10
+        </div>
+      </div>
+      <div class="auth-card dkim">
+        <div class="ac-name">DKIM</div>
+        <div class="ac-what">Was this message signed and unmodified?</div>
+        <div class="ac-checks">
+          Checks: cryptographic signature<br>
+          Against: public key in DNS<br>
+          Breaks if: body is modified<br>
+          Selector: s=value in header
+        </div>
+      </div>
+      <div class="auth-card dmarc">
+        <div class="ac-name">DMARC</div>
+        <div class="ac-what">Do SPF/DKIM align with the visible From?</div>
+        <div class="ac-checks">
+          Requires: SPF OR DKIM pass<br>
+          PLUS: domain alignment<br>
+          Policy: none/quarantine/reject<br>
+          Reports: rua= email address
+        </div>
+      </div>
+      <div class="auth-card arc">
+        <div class="ac-name">ARC</div>
+        <div class="ac-what">Preserves auth results across forwarding</div>
+        <div class="ac-checks">
+          Used when: message is forwarded<br>
+          Preserves: original SPF/DKIM results<br>
+          Added by: each hop in chain<br>
+          Helps: legitimate forwarders
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;">
+      <div style="font-family:var(--mono); font-size:11px; color:var(--text-muted); margin-bottom:12px; text-transform:uppercase; letter-spacing:2px;">Authentication Results</div>
+      <div class="status-grid">
+        <div class="status-badge sb-pass"><div class="sb-dot"></div><div><span class="sb-label">pass</span><span class="sb-desc">Check passed</span></div></div>
+        <div class="status-badge sb-fail"><div class="sb-dot"></div><div><span class="sb-label">fail</span><span class="sb-desc">Hard failure</span></div></div>
+        <div class="status-badge sb-soft"><div class="sb-dot"></div><div><span class="sb-label">softfail</span><span class="sb-desc">SPF ~all</span></div></div>
+        <div class="status-badge sb-soft"><div class="sb-dot"></div><div><span class="sb-label">temperror</span><span class="sb-desc">DNS timeout</span></div></div>
+        <div class="status-badge sb-fail"><div class="sb-dot"></div><div><span class="sb-label">permerror</span><span class="sb-desc">Config broken</span></div></div>
+        <div class="status-badge sb-none"><div class="sb-dot"></div><div><span class="sb-label">none</span><span class="sb-desc">No record found</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: Header Anatomy -->
+  <div class="section-title">03 — Header Anatomy</div>
+  <div class="card">
+    <div class="card-title">Annotated Gmail Header — hover each row for details</div>
+    <p class="hover-tip">↓ Hover any row to see what it means and why it matters</p>
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('pass')">✅ All Pass</div>
+      <div class="tab" onclick="switchTab('spf-fail')">❌ SPF Fail</div>
+      <div class="tab" onclick="switchTab('dkim-fail')">⚠️ DKIM Fail</div>
+      <div class="tab" onclick="switchTab('dmarc-fail')">🚫 DMARC Fail</div>
+    </div>
+
+    <!-- PASS scenario -->
+    <div class="tab-panel active" id="panel-pass">
+      <div class="header-block">
+        <div class="hb-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span>Email Headers — Passing</span></div>
+
+        <div class="header-line">
+          <div class="hl-tag tag-received">Delivered-To</div>
+          <div class="hl-value">recipient@gmail.com</div>
+          <div class="tooltip"><div class="tooltip-title">Delivered-To</div><div class="tooltip-body">Final delivery address. Gmail confirms it delivered here. Useful when checking forwarding or aliasing issues.</div><span class="tooltip-badge badge-info">INFO</span></div>
+        </div>
+
+        <div class="header-line">
+          <div class="hl-tag tag-auth">Authentication-Results</div>
+          <div class="hl-value"><span class="val-pass">dkim=pass</span> header.i=@sender.com header.s=selector1; <span class="val-pass">spf=pass</span> smtp.mailfrom=sender@sender.com; <span class="val-pass">dmarc=pass</span> (p=QUARANTINE) header.from=sender.com</div>
+          <div class="tooltip"><div class="tooltip-title">Authentication-Results</div><div class="tooltip-body">THE most important header. Shows SPF, DKIM, and DMARC results. Read this first on every deliverability issue. All three pass here — message is fully authenticated.</div><span class="tooltip-badge badge-critical">CRITICAL</span></div>
+        </div>
+
+        <div class="header-line">
+          <div class="hl-tag tag-dkim">DKIM-Signature</div>
+          <div class="hl-value">v=1; a=rsa-sha256; d=sender.com; s=selector1; h=from:to:subject:date; bh=Abc123==; b=XyzSig==</div>
+          <div class="tooltip"><div class="tooltip-title">DKIM-Signature</div><div class="tooltip-body"><strong>d=</strong> is the signing domain (must align with From for DMARC).<br><strong>s=</strong> is the selector — find the public key at selector1._domainkey.sender.com<br><strong>bh=</strong> is the body hash — if the body was modified, this won't match.</div><span class="tooltip-badge badge-important">IMPORTANT</span></div>
+        </div>
+
+        <div class="header-line">
+          <div class="hl-tag tag-received">Received</div>
+          <div class="hl-value">from mail.sender.com (mail.sender.com [203.0.113.45]) by mx.google.com with SMTPS; Mon, 20 May 2024 09:15:31 -0700</div>
+          <div class="tooltip"><div class="tooltip-title">Received (hop)</div><div class="tooltip-body">Read ALL Received headers bottom-to-top to trace the message path. "from" = who sent it. "by" = who received it. The IP in brackets is what SPF validates against.</div><span class="tooltip-badge badge-critical">CRITICAL — Read Bottom to Top</span></div>
+        </div>
+
+        <div class="header-line">
+          <div class="hl-tag tag-received">Received</div>
+          <div class="hl-value">from [192.168.1.105] (unknown [203.0.113.45]) by mail.sender.com (Postfix); Mon, 20 May 2024 12:15:29 -0400</div>
+          <div class="tooltip"><div class="tooltip-title">Received (origin)</div><div class="tooltip-body">The BOTTOM-MOST Received header is where the message started. [192.168.1.105] is the sender's local machine. (203.0.113.45) is the public IP — this is what SPF validated.</div><span class="tooltip-badge badge-critical">ORIGIN HOP</span></div>
+        </div>
+
+        <div class="header-line">
+          <div class="hl-tag tag-return">Return-Path</div>
+          <div class="hl-value">&lt;sender@sender.com&gt;</div>
+          <div class="tooltip"><div class="tooltip-title">Return-Path (Envelope Sender)</div><div class="tooltip-body">This is the MAIL FROM used during SMTP transmission. It's the envelope sender — what SPF actually checks. It may differ from the visible From header. Bounces go here.</div><span class="tooltip-badge badge-critical">SPF CHECKS THIS</span></div>
+        </div>
+
+        <div class="header-line">
+          <div class="hl-tag tag-from">From</div>
+          <div class="hl-value">Jane Smith &lt;sender@sender.com&gt;</div>
+          <div class="tooltip"><div class="tooltip-title">From (Visible Sender)</div><div class="tooltip-body">What the recipient SEES. This is what DMARC alignment checks against — the d= domain in DKIM and the MAIL FROM domain must align with this domain.</div><span class="tooltip-badge badge-critical">DMARC ALIGNS TO THIS</span></div>
+        </div>
+
+        <div class="header-line">
+          <div class="hl-tag tag-msgid">Message-ID</div>
+          <div class="hl-value">&lt;CABxxxxxxxxxxxxxxx@mail.gmail.com&gt;</div>
+          <div class="tooltip"><div class="tooltip-title">Message-ID</div><div class="tooltip-body">Unique identifier assigned by the originating server. The domain after @ often reveals the actual mail server that generated the message. Useful for cross-referencing logs.</div><span class="tooltip-badge badge-info">UNIQUE ID</span></div>
+        </div>
+
+        <div class="header-line">
+          <div class="hl-tag tag-msgid">To</div>
+          <div class="hl-value">recipient@gmail.com</div>
+          <div class="tooltip"><div class="tooltip-title">To (Header)</div><div class="tooltip-body">The visible recipient. This can differ from the RCPT TO envelope address. Important in BCC, forwarding, and alias scenarios. Not what delivery is based on.</div><span class="tooltip-badge badge-info">VISIBLE ONLY</span></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SPF FAIL -->
+    <div class="tab-panel" id="panel-spf-fail">
+      <div class="header-block">
+        <div class="hb-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span>Email Headers — SPF Fail / DMARC Fail</span></div>
+
+        <div class="header-line">
+          <div class="hl-tag tag-auth">Authentication-Results</div>
+          <div class="hl-value"><span class="val-fail">spf=fail</span> (domain of sender@company.com does NOT designate 198.51.100.23 as permitted sender) smtp.mailfrom=sender@company.com; <span class="val-fail">dmarc=fail</span> (p=REJECT) header.from=company.com</div>
+          <div class="tooltip"><div class="tooltip-title">SPF Fail → DMARC Fail</div><div class="tooltip-body">The sending IP (198.51.100.23) is not in company.com's SPF record. DMARC fails because SPF alignment fails and DKIM isn't present. With p=REJECT this message will be blocked. Fix: add the IP or service to the SPF record.</div><span class="tooltip-badge badge-critical">MESSAGE BLOCKED</span></div>
+        </div>
+
+        <div class="header-line">
+          <div class="hl-tag tag-received">Received</div>
+          <div class="hl-value">from mail.thirdparty.com (thirdparty.com [198.51.100.23]) by mx.google.com; Mon, 20 May 2024 09:15:31 -0700</div>
+          <div class="tooltip"><div class="tooltip-title">The relay's IP</div><div class="tooltip-body">198.51.100.23 is the IP that sent the message. This is the IP SPF checked — and it's not in company.com's SPF record. This is a relay that wasn't added to SPF. Common when adding new sending tools.</div><span class="tooltip-badge badge-critical">THIS IP FAILED SPF</span></div>
+        </div>
+
+        <div class="header-line">
+          <div class="hl-tag tag-return">Return-Path</div>
+          <div class="hl-value">&lt;sender@company.com&gt;</div>
+          <div class="tooltip"><div class="tooltip-title">Return-Path</div><div class="tooltip-body">The envelope MAIL FROM domain is company.com. SPF checked this domain's record against the sending IP and failed. The SPF record for company.com doesn't list thirdparty.com's IPs.</div><span class="tooltip-badge badge-critical">SPF CHECKED THIS DOMAIN</span></div>
+        </div>
+
+        <div class="header-line">
+          <div class="hl-tag tag-from">From</div>
+          <div class="hl-value">Marketing Team &lt;sender@company.com&gt;</div>
+          <div class="tooltip"><div class="tooltip-title">From</div><div class="tooltip-body">The visible From domain matches the Return-Path domain (company.com). Alignment would have passed IF SPF had passed. The fix is updating SPF, not the From address.</div><span class="tooltip-badge badge-info">ALIGNMENT WOULD PASS IF SPF PASSED</span></div>
+        </div>
+
+      </div>
+      <div style="background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2); border-radius:8px; padding:16px; margin-top:12px; font-family:var(--mono); font-size:12px; color:var(--text-muted); line-height:1.7;">
+        <span style="color:#ef4444; font-weight:700;">FIX:</span> Add the relay's IP or <code style="color:#f59e0b;">include:thirdparty.com</code> to company.com's SPF TXT record.<br>
+        Check current SPF: <code style="color:var(--accent);">dig TXT company.com</code> — count the lookups, must be under 10.
+      </div>
+    </div>
+
+    <!-- DKIM FAIL -->
+    <div class="tab-panel" id="panel-dkim-fail">
+      <div class="header-block">
+        <div class="hb-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span>Email Headers — DKIM Body Hash Fail</span></div>
+
+        <div class="header-line">
+          <div class="hl-tag tag-auth">Authentication-Results</div>
+          <div class="hl-value"><span class="val-fail">dkim=fail</span> (body hash did not verify) header.i=@company.com header.s=selector1; <span class="val-pass">spf=pass</span> smtp.mailfrom=company.com; <span class="val-pass">dmarc=pass</span> (p=QUARANTINE) header.from=company.com</div>
+          <div class="tooltip"><div class="tooltip-title">DKIM Body Hash Fail</div><div class="tooltip-body">"Body hash did not verify" means the message body was modified AFTER DKIM signing. Common causes: URL rewriting by security gateways, disclaimer insertion, email signature tools modifying body. DMARC still passes here because SPF passed with alignment.</div><span class="tooltip-badge badge-important">BODY MODIFIED IN TRANSIT</span></div>
+        </div>
+
+        <div class="header-line">
+          <div class="hl-tag tag-dkim">DKIM-Signature</div>
+          <div class="hl-value">v=1; a=rsa-sha256; d=company.com; s=selector1; bh=<span style="color:#ef4444;">ORIGINAL_HASH_NO_LONGER_MATCHES</span>; b=signature==</div>
+          <div class="tooltip"><div class="tooltip-title">DKIM Signature — bh= mismatch</div><div class="tooltip-body">The bh= (body hash) was computed when the message was signed. Something modified the body between signing and delivery, so the hash no longer matches. The signature itself may be valid — the body changed.</div><span class="tooltip-badge badge-critical">BODY CHANGED AFTER SIGNING</span></div>
+        </div>
+
+        <div class="header-line">
+          <div class="hl-tag tag-received">Received</div>
+          <div class="hl-value">from proofpoint.company.com (proofpoint [10.0.0.50]) ... (added URL rewriting footer)</div>
+          <div class="tooltip"><div class="tooltip-title">Security Gateway Hop</div><div class="tooltip-body">Security gateways like Proofpoint and Mimecast often rewrite URLs in the message body for click tracking and threat protection. This body modification breaks DKIM. If this is the cause, DKIM failure here is expected and DMARC passing via SPF is the fallback.</div><span class="tooltip-badge badge-important">LIKELY CULPRIT</span></div>
+        </div>
+
+      </div>
+      <div style="background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.2); border-radius:8px; padding:16px; margin-top:12px; font-family:var(--mono); font-size:12px; color:var(--text-muted); line-height:1.7;">
+        <span style="color:#f59e0b; font-weight:700;">NOTE:</span> This is the same reason Opensense strips DKIM. Modifying the body invalidates the existing signature. After Opensense processes the message and hands it back, the customer's mail system re-signs DKIM outbound. This is expected behavior — not a bug.
+      </div>
+    </div>
+
+    <!-- DMARC FAIL -->
+    <div class="tab-panel" id="panel-dmarc-fail">
+      <div class="header-block">
+        <div class="hb-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span>Email Headers — DMARC Alignment Fail</span></div>
+
+        <div class="header-line">
+          <div class="hl-tag tag-auth">Authentication-Results</div>
+          <div class="hl-value"><span class="val-pass">spf=pass</span> (designates 198.51.100.55 as permitted sender) smtp.mailfrom=bounce@thirdparty.com; <span class="val-fail">dmarc=fail</span> (p=REJECT) header.from=company.com</div>
+          <div class="tooltip"><div class="tooltip-title">DMARC Alignment Fail</div><div class="tooltip-body">SPF passes but DMARC fails. Why? The envelope MAIL FROM domain is thirdparty.com but the visible From is company.com. These don't align. SPF passes for thirdparty.com but that doesn't help company.com's DMARC. Fix: configure the third party to sign DKIM with company.com's domain.</div><span class="tooltip-badge badge-critical">ALIGNMENT MISMATCH</span></div>
+        </div>
+
+        <div class="header-line">
+          <div class="hl-tag tag-return">Return-Path</div>
+          <div class="hl-value">&lt;bounce@thirdparty.com&gt;</div>
+          <div class="tooltip"><div class="tooltip-title">Return-Path — Wrong Domain</div><div class="tooltip-body">The envelope MAIL FROM domain is thirdparty.com. SPF passed for thirdparty.com — that domain authorized this IP. But thirdparty.com doesn't align with company.com in the From header. SPF alignment fails for DMARC purposes.</div><span class="tooltip-badge badge-critical">DOMAIN MISMATCH</span></div>
+        </div>
+
+        <div class="header-line">
+          <div class="hl-tag tag-from">From</div>
+          <div class="hl-value">Company Name &lt;noreply@company.com&gt;</div>
+          <div class="tooltip"><div class="tooltip-title">From — The DMARC Reference Domain</div><div class="tooltip-body">DMARC checks whether the From domain (company.com) aligns with the SPF MAIL FROM domain (thirdparty.com) or the DKIM d= domain. Neither aligns here — no DKIM present, SPF is on a different domain. DMARC fails.</div><span class="tooltip-badge badge-critical">DMARC ALIGNS TO THIS</span></div>
+        </div>
+
+      </div>
+      <div style="background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2); border-radius:8px; padding:16px; margin-top:12px; font-family:var(--mono); font-size:12px; color:var(--text-muted); line-height:1.7;">
+        <span style="color:#ef4444; font-weight:700;">FIX:</span> Configure DKIM signing on the third-party platform using company.com's domain. Add the DKIM CNAME records to company.com's DNS. Once DKIM d=company.com passes, DMARC alignment passes even if the envelope MAIL FROM is on a different domain.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SECTION 4: Opensense Flow -->
+  <div class="section-title">04 — Opensense Mail Flow</div>
+  <div class="card">
+    <div class="card-title">What Opensense does and does NOT do</div>
+    <div class="os-flow">
+      <div class="os-step">
+        <div class="os-num">1</div>
+        <div class="os-content">
+          <div class="os-title">User sends email from Outlook or Gmail</div>
+          <div class="os-desc">Client hands message to M365 or Google Workspace via SMTP. DKIM is signed at this point by the customer's mail platform.</div>
+        </div>
+      </div>
+      <div class="os-step">
+        <div class="os-num">2</div>
+        <div class="os-content">
+          <div class="os-title">Connector routes message to Opensense</div>
+          <div class="os-desc">A mail flow rule or connector in M365/GWS routes outbound messages to Opensense over a secure TLS connection before they leave the tenant.</div>
+        </div>
+      </div>
+      <div class="os-step os-highlight">
+        <div class="os-num">3</div>
+        <div class="os-content">
+          <div class="os-title">Opensense strips inbound DKIM signature</div>
+          <div class="os-desc">Opensense will modify the message body (add signature HTML, banner, etc.). A modified body invalidates the existing DKIM hash. Stripping it is correct behavior — a broken DKIM signature is worse than none.</div>
+        </div>
+      </div>
+      <div class="os-step os-highlight">
+        <div class="os-num">4</div>
+        <div class="os-content">
+          <div class="os-title">Opensense processes and routes the message</div>
+          <div class="os-desc">Signature and banner are added. Message is handed back to the originating mail system (or to a configured relay like Zendesk, Front, or Outreach).</div>
+        </div>
+      </div>
+      <div class="os-step">
+        <div class="os-num">5</div>
+        <div class="os-content">
+          <div class="os-title">Customer's mail system re-signs DKIM and sends outbound</div>
+          <div class="os-desc">M365 or GWS applies a fresh DKIM signature to the modified message. SPF, DKIM, and DMARC are all evaluated at this outbound stage — not while Opensense was processing.</div>
+        </div>
+      </div>
+      <div class="os-step">
+        <div class="os-num">6</div>
+        <div class="os-content">
+          <div class="os-title">Recipient's server runs authentication checks</div>
+          <div class="os-desc">Authentication-Results are added. SPF validates the final sending IP. DKIM validates the re-signed signature. DMARC checks alignment. Opensense is not involved at this stage.</div>
+        </div>
+      </div>
+    </div>
+    <div style="background:rgba(124,58,237,0.08); border:1px solid rgba(124,58,237,0.25); border-radius:8px; padding:16px; margin-top:4px; font-family:var(--mono); font-size:12px; color:var(--text-muted); line-height:1.7;">
+      <span style="color:#a78bfa; font-weight:700;">WHEN CUSTOMERS BLAME OPENSENSE:</span> Opensense appears as a hop in Received headers. Admins who don't understand third-party mail flow see an unfamiliar server and assume it's the problem. In reality — Opensense does not control SPF, does not sign DKIM, and does not set DMARC policy. The customer's domain and mail platform control all of that.
+    </div>
+  </div>
+
+  <!-- SECTION 5: Troubleshooting Tree -->
+  <div class="section-title">05 — Troubleshooting Decision Tree</div>
+  <div class="card">
+    <div class="card-title">Ask these questions in order — every time</div>
+    <div class="tree">
+
+      <div class="tree-node">
+        <div class="tree-question"><span class="step-num">1</span>Did the message send at all?</div>
+        <div class="tree-answers">
+          <div class="tree-answer yes"><div class="ans-label">Yes — there's a sent record</div>Move to Step 2. Check headers.</div>
+          <div class="tree-answer no"><div class="ans-label">No — nothing sent</div>Check SMTP settings, auth, network. Is the connector working?</div>
+        </div>
+      </div>
+
+      <div class="tree-node">
+        <div class="tree-question"><span class="step-num">2</span>Is there an NDR (bounce)?</div>
+        <div class="tree-answers">
+          <div class="tree-answer yes"><div class="ans-label">Yes — read the NDR</div>Note the SMTP code (550/421/etc.) and exact error text. That tells you who rejected it and why.</div>
+          <div class="tree-answer no"><div class="ans-label">No bounce — went to spam</div>Check Authentication-Results. Check domain/IP reputation via MXToolbox Blacklist.</div>
+        </div>
+      </div>
+
+      <div class="tree-node">
+        <div class="tree-question"><span class="step-num">3</span>Read the Received headers — did it travel the expected path?</div>
+        <div class="tree-answers">
+          <div class="tree-answer check"><div class="ans-label">Read bottom to top</div>Each hop = one server. Does Opensense appear? Does the path match the connector config?</div>
+          <div class="tree-answer no"><div class="ans-label">Unexpected hops</div>A relay or security gateway in the path may be modifying the message or using an IP not in SPF.</div>
+        </div>
+      </div>
+
+      <div class="tree-node">
+        <div class="tree-question"><span class="step-num">4</span>Check Authentication-Results — what passed and what failed?</div>
+        <div class="tree-answers">
+          <div class="tree-answer yes"><div class="ans-label">All pass</div>Deliverability issue is reputation or content. Check blacklists, spam score, sending volume.</div>
+          <div class="tree-answer no"><div class="ans-label">SPF fail</div>Check the sending IP against the SPF record. Is a relay not in SPF? Check lookup count (max 10).</div>
+        </div>
+      </div>
+
+      <div class="tree-node">
+        <div class="tree-question"><span class="step-num">5</span>If DKIM failed — body hash or signature?</div>
+        <div class="tree-answers">
+          <div class="tree-answer check"><div class="ans-label">Body hash fail</div>Body was modified after signing. Check for security gateways, disclaimers, signature tools in the path.</div>
+          <div class="tree-answer no"><div class="ans-label">Signature fail</div>Key mismatch. Look up selector._domainkey.domain in DNS. Does the public key exist and match?</div>
+        </div>
+      </div>
+
+      <div class="tree-node">
+        <div class="tree-question"><span class="step-num">6</span>If DMARC failed — did alignment fail even though SPF or DKIM passed?</div>
+        <div class="tree-answers">
+          <div class="tree-answer check"><div class="ans-label">SPF passed but wrong domain</div>Envelope MAIL FROM domain doesn't align with From header domain. Third-party sender needs DKIM with the From domain.</div>
+          <div class="tree-answer no"><div class="ans-label">Both SPF and DKIM failed</div>Fix the underlying SPF or DKIM issue first. DMARC needs at least one to pass with alignment.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SECTION 6: SMTP Codes -->
+  <div class="section-title">06 — SMTP Response Codes</div>
+  <div class="card">
+    <div class="card-title">What the server is actually telling you</div>
+    <div class="code-grid">
+      <div class="smtp-code"><div class="code-num code-250">250</div><div class="code-info"><div class="code-title">OK / Success</div><div class="code-desc">Message accepted or command succeeded.</div></div></div>
+      <div class="smtp-code"><div class="code-num code-250">354</div><div class="code-info"><div class="code-title">Start Input</div><div class="code-desc">Ready to receive message body after DATA command.</div></div></div>
+      <div class="smtp-code"><div class="code-num code-4xx">421</div><div class="code-info"><div class="code-title">Service Unavailable</div><div class="code-desc">Temp fail. Server busy or rate limiting. Will retry.</div></div></div>
+      <div class="smtp-code"><div class="code-num code-4xx">450</div><div class="code-info"><div class="code-title">Mailbox Unavailable</div><div class="code-desc">Temp reject. Often greylisting — retry later.</div></div></div>
+      <div class="smtp-code"><div class="code-num code-4xx">451</div><div class="code-info"><div class="code-title">Local Error</div><div class="code-desc">Temp failure on receiving end. Retry expected.</div></div></div>
+      <div class="smtp-code"><div class="code-num code-5xx">550</div><div class="code-info"><div class="code-title">Mailbox Unavailable</div><div class="code-desc">Permanent. User doesn't exist or policy block.</div></div></div>
+      <div class="smtp-code"><div class="code-num code-5xx">551</div><div class="code-info"><div class="code-title">User Not Local</div><div class="code-desc">Recipient address rejected — try forwarding.</div></div></div>
+      <div class="smtp-code"><div class="code-num code-5xx">552</div><div class="code-info"><div class="code-title">Storage Full</div><div class="code-desc">Recipient mailbox over quota.</div></div></div>
+      <div class="smtp-code"><div class="code-num code-5xx">554</div><div class="code-info"><div class="code-title">Transaction Failed</div><div class="code-desc">Message rejected by policy — spam, auth fail, blacklist.</div></div></div>
+      <div class="smtp-code"><div class="code-num code-5xx">550 5.7.1</div><div class="code-info"><div class="code-title">Policy Rejection</div><div class="code-desc">Most common. Authentication failure or reputation block.</div></div></div>
+    </div>
+  </div>
+
+  <div style="text-align:center; padding:40px 0 20px; font-family:var(--mono); font-size:11px; color:var(--text-muted); opacity:0.5;">
+    Opensense Implementation Engineering · Email Troubleshooting Reference
+  </div>
+
+</div>
+
+<script>
+  // Tab switching
+  function switchTab(id) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + id).classList.add('active');
+    event.target.classList.add('active');
+  }
+
+  // Mobile tap-to-expand for header lines
+  function isMobile() { return window.innerWidth <= 700; }
+
+  document.addEventListener('DOMContentLoaded', function() {
+
+    // Header anatomy rows: tap to expand tooltip inline on mobile
+    document.querySelectorAll('.header-line').forEach(function(row) {
+      row.addEventListener('click', function() {
+        if (!isMobile()) return;
+        var wasExpanded = row.classList.contains('expanded');
+        // Collapse all others in same panel
+        var panel = row.closest('.tab-panel');
+        if (panel) {
+          panel.querySelectorAll('.header-line').forEach(function(r) {
+            r.classList.remove('expanded');
+          });
+        }
+        if (!wasExpanded) row.classList.add('expanded');
+      });
+    });
+
+    // SMTP rows: tap to toggle tooltip inline on mobile
+    document.querySelectorAll('.smtp-row').forEach(function(row) {
+      row.addEventListener('click', function() {
+        if (!isMobile()) return;
+        var tip = row.querySelector('.smtp-ttip');
+        if (!tip) return;
+        var isVisible = tip.style.display === 'block';
+        // Collapse all
+        document.querySelectorAll('.smtp-ttip').forEach(function(t) {
+          t.style.display = 'none';
+        });
+        if (!isVisible) {
+          tip.style.display = 'block';
+          tip.style.opacity = '1';
+        }
+      });
+    });
+
+  });
+</script>
+</body>
+</html>
